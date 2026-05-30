@@ -75,7 +75,7 @@ Live site: **https://appmeta.maskedsyntax.com**
 
 ### Deployment
 
-Pushes to `main` that touch `website/**` run [`.github/workflows/deploy-website.yml`](.github/workflows/deploy-website.yml), which builds the static site and publishes to GitHub Pages.
+Pushes to `master` that touch `website/**` run [`.github/workflows/deploy-website.yml`](.github/workflows/deploy-website.yml), which builds the static site and publishes to GitHub Pages.
 
 1. **Settings → Pages → Build and deployment → Source:** GitHub Actions
 2. **Custom domain:** `appmeta.maskedsyntax.com` (also in [`website/static/CNAME`](website/static/CNAME))
