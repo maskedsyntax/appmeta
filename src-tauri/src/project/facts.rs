@@ -1,4 +1,5 @@
 use crate::project::truth_file::*;
+use crate::scanner::best_privacy_policy_url;
 use crate::scanner::documents;
 use crate::scanner::naming::humanize_token;
 use crate::scanner::ProjectScanResult;
@@ -111,11 +112,7 @@ fn apply_scan_suggestions(project: &mut ProjectTruthFile, scan: &ProjectScanResu
         project.app_identity.primary_category = hint;
     }
 
-    if let Some(url) = scan
-        .detected_urls
-        .iter()
-        .find(|u| u.kind == "privacy_policy")
-    {
+    if let Some(url) = best_privacy_policy_url(&scan.detected_urls) {
         if project.privacy.privacy_policy_url.is_empty() {
             project.privacy.privacy_policy_url = url.url.clone();
         }
@@ -316,11 +313,7 @@ fn populate_scan_facts(project: &mut ProjectTruthFile, scan: &ProjectScanResult)
         });
     }
 
-    if let Some(url) = scan
-        .detected_urls
-        .iter()
-        .find(|u| u.kind == "privacy_policy")
-    {
+    if let Some(url) = best_privacy_policy_url(&scan.detected_urls) {
         project.source_facts.push(SourceFact {
             id: Uuid::new_v4().to_string(),
             fact: format!(

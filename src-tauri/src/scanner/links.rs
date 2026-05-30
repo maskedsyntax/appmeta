@@ -104,10 +104,10 @@ fn extract_urls(content: &str) -> Vec<String> {
                 })
                 .to_string();
         }
-        if cleaned.starts_with("http://") || cleaned.starts_with("https://") {
-            if !urls.contains(&cleaned) {
-                urls.push(cleaned);
-            }
+        if (cleaned.starts_with("http://") || cleaned.starts_with("https://"))
+            && !urls.contains(&cleaned)
+        {
+            urls.push(cleaned);
         }
     }
     urls

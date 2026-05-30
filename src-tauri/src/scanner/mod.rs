@@ -5,6 +5,7 @@ mod permissions;
 pub mod documents;
 mod features;
 mod links;
+pub use links::best_privacy_policy_url;
 pub mod naming;
 
 pub mod types;

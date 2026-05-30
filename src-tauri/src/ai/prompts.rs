@@ -73,7 +73,7 @@ pub fn build_compact_context(project: &ProjectTruthFile) -> String {
     }
     if !project.question_answers.is_empty() {
         out.push_str("\nConfirmed answers:\n");
-        for (_, answer) in &project.question_answers {
+        for answer in project.question_answers.values() {
             out.push_str(&format!("- {answer}\n"));
         }
     }
