@@ -17,14 +17,22 @@
   }
 
   async function copy() {
-    const val = "value" in field ? field.value : "";
-    await navigator.clipboard.writeText(val ?? "");
+    await navigator.clipboard.writeText(displayValue);
     oncopy?.();
   }
 
   const value = $derived(("value" in field ? field.value : "") ?? "");
+  const displayValue = $derived.by(() => {
+    if (value) return value;
+    if ("alternatives" in field && field.alternatives?.length) {
+      return field.alternatives[0];
+    }
+    return "";
+  });
   const charCount = $derived(
-    "character_count" in field ? field.character_count : value.length,
+    "character_count" in field && field.value
+      ? field.character_count
+      : displayValue.length,
   );
   const maxChars = $derived("max_characters" in field ? field.max_characters : null);
   const overLimit = $derived(maxChars != null && charCount > maxChars);
@@ -39,16 +47,16 @@
       {:else}
         <span class="count">{charCount} chars</span>
       {/if}
-      <button type="button" onclick={copy} disabled={!value}>Copy</button>
+      <button type="button" onclick={copy} disabled={!displayValue}>Copy</button>
       <button type="button" class="regenerate" onclick={regenerate} disabled={generating}>
         {generating ? "..." : "Regenerate"}
       </button>
     </div>
   </div>
-  {#if value}
-    <textarea readonly rows={Math.min(12, Math.max(3, value.split("\n").length))}>{value}</textarea>
+  {#if displayValue}
+    <textarea readonly rows={Math.min(12, Math.max(3, displayValue.split("\n").length))}>{displayValue}</textarea>
   {:else}
-    <p class="empty">Not generated yet.</p>
+    <p class="empty">Not generated yet — click Regenerate or use Generate All.</p>
   {/if}
   {#if "warnings" in field && field.warnings?.length}
     <ul class="meta">
@@ -67,10 +75,10 @@
 
 <style>
   .field-card {
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-border-subtle);
     border-radius: var(--radius-md);
-    padding: 0.75rem;
-    margin-bottom: 1rem;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.85rem;
     background: var(--color-surface);
   }
 
@@ -78,15 +86,19 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.65rem;
     gap: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--color-border-subtle);
   }
 
   h3 {
     margin: 0;
-    font-size: 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
     text-transform: capitalize;
     color: var(--color-text);
+    letter-spacing: -0.01em;
   }
 
   .actions {
@@ -110,13 +122,14 @@
     width: 100%;
     box-sizing: border-box;
     font-family: inherit;
-    font-size: 0.9rem;
-    padding: 0.5rem;
+    font-size: 0.875rem;
+    padding: 0.55rem 0.65rem;
     resize: vertical;
     background: var(--color-bg-input);
     color: var(--color-text);
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-border-subtle);
     border-radius: var(--radius-sm);
+    line-height: 1.5;
   }
 
   .empty {
@@ -145,9 +158,13 @@
   }
 
   .regenerate {
-    background: var(--gradient-brand-subtle);
-    border-color: rgba(56, 151, 255, 0.3);
+    background: transparent;
+    border-color: rgba(74, 158, 255, 0.35);
     color: var(--color-primary);
+  }
+
+  .regenerate:hover:not(:disabled) {
+    background: var(--color-primary-muted);
   }
 
   button {

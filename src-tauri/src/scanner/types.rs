@@ -17,6 +17,7 @@ pub struct ProjectScanResult {
     pub risk_flags: Vec<RiskFlag>,
     pub questions: Vec<ConfirmationQuestion>,
     pub document_summaries: Vec<DocumentSummary>,
+    pub detected_urls: Vec<DetectedUrl>,
     pub confidence: String,
 }
 
@@ -67,4 +68,12 @@ pub struct DocumentSummary {
     pub file_name: String,
     pub first_paragraph: String,
     pub line_count: usize,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DetectedUrl {
+    pub url: String,
+    pub kind: String,
+    pub source_file: String,
+    pub confidence: String,
 }

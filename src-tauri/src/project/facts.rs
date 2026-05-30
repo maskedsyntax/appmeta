@@ -41,6 +41,7 @@ pub fn create_project_from_scan(scan: ProjectScanResult) -> ProjectTruthFile {
         source_facts: Vec::new(),
         generated_fields: Vec::new(),
         question_answers: std::collections::HashMap::new(),
+        scan_questions: scan.questions.clone(),
     };
 
     if let Some(framework) = &scan.framework {
@@ -155,6 +156,28 @@ pub fn create_project_from_scan(scan: ProjectScanResult) -> ProjectTruthFile {
                 project.summary.short_summary = doc.first_paragraph.clone();
             }
         }
+    }
+
+    if let Some(privacy_url) = scan
+        .detected_urls
+        .iter()
+        .find(|u| u.kind == "privacy_policy")
+    {
+        if project.privacy.privacy_policy_url.is_empty() {
+            project.privacy.privacy_policy_url = privacy_url.url.clone();
+        }
+        project.source_facts.push(SourceFact {
+            id: Uuid::new_v4().to_string(),
+            fact: format!(
+                "Privacy policy URL detected: {} (confirm this is correct for App Store Connect)",
+                privacy_url.url
+            ),
+            source_type: "scanner".into(),
+            source_file: privacy_url.source_file.clone(),
+            confidence: privacy_url.confidence.clone(),
+            verified: false,
+            status: "needs_confirmation".into(),
+        });
     }
 
     project

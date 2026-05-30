@@ -2,10 +2,16 @@
   import { project } from "$lib/stores/appStore";
   import { PRODUCT_PAGE_FIELDS } from "$lib/types";
   import FieldCard from "$lib/components/FieldCard.svelte";
+  import GenerateAllBar from "$lib/components/GenerateAllBar.svelte";
 
-  function getField(name: string) {
-    return $project?.generated_fields.find((f) => f.field === name) ?? { field: name, value: "" };
-  }
+  const fieldMap = $derived(
+    Object.fromEntries(
+      PRODUCT_PAGE_FIELDS.map((name) => [
+        name,
+        $project?.generated_fields.find((f) => f.field === name) ?? { field: name, value: "" },
+      ]),
+    ),
+  );
 </script>
 
 <h2>Product Page</h2>
@@ -14,8 +20,9 @@
 {#if !$project}
   <p class="empty">No project loaded. <a href="/">Connect a project</a> and confirm facts first.</p>
 {:else}
+  <GenerateAllBar fields={[...PRODUCT_PAGE_FIELDS]} label="Generate All Product Page Fields" />
   {#each PRODUCT_PAGE_FIELDS as fieldName}
-    <FieldCard field={getField(fieldName)} />
+    <FieldCard field={fieldMap[fieldName]} />
   {/each}
 {/if}
 

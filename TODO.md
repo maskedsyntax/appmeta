@@ -1,6 +1,6 @@
 # AppMeta TODO
 
-Implementation checklist for the AppMeta MVP. See [spec.md](spec.md) for full product details.
+Implementation checklist for the AppMeta MVP. See [spec.md](spec.md) for full product details and [plan.md](plan.md) for the multi-stack scanner roadmap.
 
 ## Phase 1 — Skeleton
 
@@ -12,7 +12,7 @@ Implementation checklist for the AppMeta MVP. See [spec.md](spec.md) for full pr
 - [x] App error types (`error.rs`)
 - [x] Warnings panel in layout
 
-## Phase 2 — Scanner
+## Phase 2 — Scanner (Flutter)
 
 - [x] `scanner/flutter.rs` — parse `pubspec.yaml`
 - [x] `scanner/ios.rs` — parse `Info.plist`
@@ -75,9 +75,75 @@ Implementation checklist for the AppMeta MVP. See [spec.md](spec.md) for full pr
 - [x] CI: cargo test, clippy, npm check
 - [x] Updated `.gitignore`
 
-## MVP Complete When
+## Phase 9 — Multi-Stack Scanner
 
-- [ ] Manual E2E: scan real Flutter project → confirm facts → generate → export
+See [plan.md](plan.md) for architecture and file-level detail.
+
+### 9A — Detection & routing
+
+- [ ] `scanner/detect.rs` — project type enum + ordered heuristics
+- [ ] Refactor `scanner/mod.rs` — dispatch to stack modules instead of Flutter-only gate
+- [ ] Helpful `InvalidProject` error listing supported types
+- [ ] Scan UI: framework badge + stack-specific files scanned
+
+### 9B — Swift (Package.swift)
+
+- [ ] `scanner/swift_spm.rs` — parse `Package.swift` (name, platforms, dependencies)
+- [ ] Parse `Package.resolved` for pinned versions
+- [ ] Discover Info.plist + `*.entitlements` for SPM layouts
+- [ ] Feature detection from `Sources/**/*.swift`
+- [ ] SPM dependency risk mapping in `dependencies.rs`
+- [ ] Fixture: `tests/fixtures/swift-spm-minimal/` + unit test
+
+### 9C — iOS Native (.xcodeproj)
+
+- [ ] `scanner/ios_native.rs` — parse `project.pbxproj` (bundle ID, version, build, min OS, targets)
+- [ ] Resolve Info.plist path from pbxproj `INFOPLIST_FILE`
+- [ ] Parse `*.entitlements` and optional `Podfile.lock`
+- [ ] Feature detection from Swift/ObjC source filenames
+- [ ] Fixture: `tests/fixtures/ios-native-minimal/` + unit test
+
+### 9D — React Native
+
+- [ ] `scanner/react_native.rs` — parse `package.json` (name, version, dependencies)
+- [ ] Discover iOS plist under `ios/<Target>/Info.plist`
+- [ ] npm dependency risk mapping in `dependencies.rs` (Firebase, Sentry, ads, IAP, etc.)
+- [ ] Feature detection from `src/`, `screens/`, `pages/` (`.tsx`, `.jsx`)
+- [ ] Fixture: `tests/fixtures/react-native-minimal/` + unit test
+
+### 9E — Expo
+
+- [ ] `scanner/expo.rs` — parse `app.json` / static `app.config.*` fields
+- [ ] Parse Expo SDK deps from `package.json`
+- [ ] Reuse RN ios/android paths when prebuild output exists
+- [ ] Optional: parse `eas.json` build profile metadata
+- [ ] Feature detection from `app/` (Expo Router) and `src/`
+- [ ] Fixture: `tests/fixtures/expo-minimal/` + unit test
+
+### 9F — Shared Android & iOS polish
+
+- [ ] `scanner/android.rs` — shared `AndroidManifest.xml` parser (permissions, package, version)
+- [ ] Extend `scanner/ios.rs` — generic Info.plist discovery (not just `ios/Runner/`)
+- [ ] Extend `scanner/features.rs` — stack-aware source roots
+- [ ] Flutter: wire Android manifest into scan result
+- [ ] Stack-aware validation warnings in `validate_project_cmd`
+
+### 9G — Docs & E2E
+
+- [ ] Update README workflow copy (mobile project, not Flutter-only)
+- [ ] Manual E2E: Flutter project → confirm facts → generate → export
+- [ ] Manual E2E: Swift SPM project
+- [ ] Manual E2E: iOS Native (.xcodeproj) project
+- [ ] Manual E2E: React Native project
+- [ ] Manual E2E: Expo project
+
+- [x] Persist scan confirmation questions on project truth file
+- [x] Delete project from dashboard
+- [x] Generate all fields (product page, review, privacy, IAP)
+- [x] Rescan current project without losing edits
+- [x] Reset AI context preview in settings
+
+- [ ] Manual E2E per supported stack (Flutter, Swift SPM, iOS Native, React Native, Expo)
 - [x] `npm run tauri dev` launches without errors
 - [x] `npm run tauri build` produces macOS app
 
@@ -87,8 +153,7 @@ Implementation checklist for the AppMeta MVP. See [spec.md](spec.md) for full pr
 - [ ] Gemini provider
 - [ ] OpenRouter provider (partial — settings only)
 - [ ] macOS Keychain for API keys
-- [ ] Swift native project scanner
-- [ ] Android manifest scanning
+- [ ] Capacitor / Ionic project scanner
 - [ ] Localization generator
 - [ ] Screenshot caption generator
 - [ ] Saved templates

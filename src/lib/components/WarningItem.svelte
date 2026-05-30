@@ -19,11 +19,13 @@
 
 <style>
   .warning {
-    padding: 0.4rem 0.6rem;
-    margin: 0.25rem 0;
+    padding: 0.5rem 0.65rem;
+    margin: 0 0 0.35rem;
     border-radius: var(--radius-sm);
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
+    line-height: 1.45;
     background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border-subtle);
     border-left: 3px solid var(--color-text-dim);
     color: var(--color-text-muted);
   }

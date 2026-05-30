@@ -18,6 +18,8 @@ pub struct ProjectTruthFile {
     pub generated_fields: Vec<GeneratedField>,
     #[serde(default)]
     pub question_answers: std::collections::HashMap<String, String>,
+    #[serde(default)]
+    pub scan_questions: Vec<crate::scanner::ConfirmationQuestion>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -178,6 +180,7 @@ impl ProjectTruthFile {
             source_facts: Vec::new(),
             generated_fields: Vec::new(),
             question_answers: std::collections::HashMap::new(),
+            scan_questions: Vec::new(),
         }
     }
 

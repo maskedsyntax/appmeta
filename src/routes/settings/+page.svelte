@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { settings, saveSettingsStore, error } from "$lib/stores/appStore";
+  import { settings, saveSettingsStore, resetContextPreviewAck } from "$lib/stores/appStore";
   import { testAiConnection, maskApiKey } from "$lib/api/tauri";
   import type { AppSettings } from "$lib/types";
 
@@ -63,6 +63,7 @@
     <label>
       Model
       <input bind:value={local.model} placeholder="gpt-4o-mini" />
+      <small class="hint">gpt-4o-mini works well. GPT-5/o1/o3 use different API params (handled automatically).</small>
     </label>
     <label>
       Base URL
@@ -84,11 +85,16 @@
         <option value="concise">Concise</option>
       </select>
     </label>
+    <label class="checkbox-row">
+      <input type="checkbox" bind:checked={local.context_preview_acknowledged} />
+      Skip AI context preview before generating (already acknowledged)
+    </label>
     <div class="actions">
       <button type="submit" class="primary">Save Settings</button>
       <button type="button" onclick={test} disabled={testing || !local.api_key}>
         {testing ? "Testing..." : "Test Connection"}
       </button>
+      <button type="button" onclick={resetContextPreviewAck}>Reset Context Preview</button>
     </div>
   </form>
 
@@ -112,8 +118,11 @@
     padding: 0.4rem;
     box-sizing: border-box;
   }
-  .actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+  .actions { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
+  .checkbox-row { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
+  .checkbox-row input { width: auto; margin: 0; }
   .small { display: inline; width: auto; margin-left: 0.5rem; font-size: 0.8rem; }
   .masked { font-family: monospace; font-size: 0.85rem; color: var(--color-text-muted); margin-left: 0.5rem; }
   .test-result { margin-top: 1rem; padding: 0.75rem; border-radius: var(--radius-sm); }
+  .hint { display: block; margin-top: 0.35rem; font-size: 0.8rem; color: var(--color-text-dim); font-weight: normal; }
 </style>

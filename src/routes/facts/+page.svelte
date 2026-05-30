@@ -15,6 +15,12 @@
   }
 
   let selectedAnswers = $state<Record<string, string>>({});
+
+  const questions = $derived(
+    $project?.scan_questions?.length
+      ? $project.scan_questions
+      : ($scanResult?.questions ?? []),
+  );
 </script>
 
 <h2>Facts Review</h2>
@@ -23,10 +29,10 @@
 {#if !$project}
   <p class="empty">No project loaded. <a href="/">Connect a project</a> first.</p>
 {:else}
-  {#if $scanResult?.questions?.length || ($project && Object.keys($project.question_answers).length < ($scanResult?.questions?.length ?? 0))}
+  {#if questions.length}
     <section>
       <h3>Confirmation Questions</h3>
-      {#each ($scanResult?.questions ?? []) as q}
+      {#each questions as q}
         <div class="question">
           <p><strong>{q.question}</strong></p>
           <p class="reason">{q.reason}</p>

@@ -2,6 +2,7 @@
   import { project, persistProject } from "$lib/stores/appStore";
   import { IAP_FIELDS } from "$lib/types";
   import FieldCard from "$lib/components/FieldCard.svelte";
+  import GenerateAllBar from "$lib/components/GenerateAllBar.svelte";
 
   function getField(name: string) {
     return $project?.generated_fields.find((f) => f.field === name) ?? { field: name, value: "" };
@@ -30,6 +31,8 @@
       <button type="submit">Save IAP Details</button>
     </form>
   </section>
+
+  <GenerateAllBar fields={[...IAP_FIELDS]} label="Generate All IAP Fields" />
 
   {#each IAP_FIELDS as fieldName}
     <FieldCard field={getField(fieldName)} />

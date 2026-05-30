@@ -1,6 +1,6 @@
 <script lang="ts">
   import { pickProjectFolder } from "$lib/api/tauri";
-  import { scanResult, runScan, project, loading } from "$lib/stores/appStore";
+  import { scanResult, runScan, project, loading, rescanCurrentProject } from "$lib/stores/appStore";
 
   async function pickAndScan() {
     const path = await pickProjectFolder();
@@ -11,9 +11,16 @@
 <h2>Project Scan</h2>
 <p>Scan a local Flutter project folder. Files are read locally — nothing is uploaded.</p>
 
-<button type="button" onclick={pickAndScan} disabled={$loading}>
-  {$loading ? "Scanning..." : "Pick Folder & Scan"}
-</button>
+<div class="actions">
+  <button type="button" onclick={pickAndScan} disabled={$loading}>
+    {$loading ? "Scanning..." : "Pick Folder & Scan"}
+  </button>
+  {#if $project?.project.path}
+    <button type="button" onclick={rescanCurrentProject} disabled={$loading}>
+      Rescan Current Project
+    </button>
+  {/if}
+</div>
 
 {#if $scanResult}
   <section class="results">
@@ -63,6 +70,20 @@
       </ul>
     {/if}
 
+    {#if $scanResult.detected_urls?.length}
+      <h4>Detected URLs</h4>
+      <ul class="compact">
+        {#each $scanResult.detected_urls as link}
+          <li>
+            <strong>{link.kind.replace(/_/g, " ")}</strong>:
+            <a href={link.url} target="_blank" rel="noopener">{link.url}</a>
+            <small>({link.source_file}, {link.confidence})</small>
+          </li>
+        {/each}
+      </ul>
+      <p class="hint">Privacy URLs from project files are pre-filled on the Facts page — confirm before submitting.</p>
+    {/if}
+
     {#if $scanResult.questions.length}
       <h4>Confirmation Questions ({$scanResult.questions.length})</h4>
       <p>Answer these on the <a href="/facts">Facts</a> page.</p>
@@ -83,15 +104,22 @@
 {/if}
 
 <style>
-  button { padding: 0.5rem 1rem; margin: 1rem 0; }
-  .results { margin-top: 1rem; }
-  dl { display: grid; grid-template-columns: 140px 1fr; gap: 0.25rem 1rem; }
-  dt { font-weight: 600; color: var(--color-text-muted); }
-  dd { margin: 0; }
-  h4 { margin: 1.25rem 0 0.5rem; font-size: 0.95rem; color: var(--color-text); }
-  .compact { margin: 0; padding-left: 1.2rem; font-size: 0.9rem; }
+  .actions { display: flex; gap: 0.5rem; margin: 0 0 1.25rem; flex-wrap: wrap; }
+  .results { margin-top: 0; }
+  dl {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 0.35rem 1rem;
+    margin: 0;
+    font-size: 0.875rem;
+  }
+  dt { font-weight: 500; color: var(--color-text-dim); font-size: 0.8125rem; }
+  dd { margin: 0; color: var(--color-text); }
+  h4 { margin: 1.25rem 0 0.5rem; }
+  .compact { margin: 0; padding-left: 1.15rem; font-size: 0.875rem; line-height: 1.55; }
   .flags li { color: var(--color-warning); }
   pre { font-size: 0.75rem; overflow: auto; max-height: 400px; padding: 0.75rem; }
-  .empty { margin-top: 2rem; }
-  code { font-size: 0.85rem; word-break: break-all; }
+  .empty { margin-top: 1.5rem; }
+  .hint { font-size: 0.8125rem; color: var(--color-text-dim); margin-top: 0.5rem; line-height: 1.45; }
+  code { font-size: 0.8125rem; word-break: break-all; }
 </style>

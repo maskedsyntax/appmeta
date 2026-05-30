@@ -1,70 +1,72 @@
 /**
- * AppMeta theme — derived from appmeta-ios-dark.jpg
- * Primary blue → purple → magenta gradient on true black
+ * AppMeta — refined dark theme
+ * Brand blue from logo; magenta/purple reserved for rare emphasis only.
  */
 :root {
   color-scheme: dark;
 
   /* Backgrounds */
-  --color-bg: #000000;
-  --color-bg-main: #0a0a0f;
-  --color-bg-sidebar: #050508;
-  --color-bg-panel: #0e0e14;
-  --color-bg-elevated: #14141c;
-  --color-bg-input: #1a1a24;
+  --color-bg: #09090b;
+  --color-bg-main: #0f0f12;
+  --color-bg-sidebar: #0a0a0d;
+  --color-bg-panel: #0c0c10;
+  --color-bg-elevated: #16161b;
+  --color-bg-input: #1c1c22;
 
   /* Surfaces & borders */
-  --color-surface: #12121a;
-  --color-surface-hover: #1a1a26;
-  --color-border: #252532;
-  --color-border-subtle: #1c1c28;
+  --color-surface: #141419;
+  --color-surface-hover: #1c1c23;
+  --color-border: #27272f;
+  --color-border-subtle: #1e1e26;
 
-  /* Brand — logo gradient stops */
-  --color-primary: #3897ff;
-  --color-primary-dim: #2a6fc4;
-  --color-secondary: #7b61ff;
-  --color-accent: #ff2d78;
-  --color-indigo: #4776e6;
-
-  --gradient-brand: linear-gradient(135deg, #3897ff 0%, #7b61ff 55%, #ff2d78 100%);
-  --gradient-brand-subtle: linear-gradient(
-    135deg,
-    rgba(56, 151, 255, 0.15) 0%,
-    rgba(123, 97, 255, 0.12) 55%,
-    rgba(255, 45, 120, 0.1) 100%
-  );
+  /* Brand */
+  --color-primary: #4a9eff;
+  --color-primary-hover: #3a8aef;
+  --color-primary-muted: rgba(74, 158, 255, 0.12);
+  --color-secondary: #8b7cf6;
+  --color-accent: #e84a8a;
 
   /* Text */
-  --color-text: #e8e8f0;
-  --color-text-muted: #8888a0;
-  --color-text-dim: #5c5c70;
+  --color-text: #ececf1;
+  --color-text-muted: #9494a8;
+  --color-text-dim: #63637a;
 
   /* Semantic */
-  --color-success: #34d399;
-  --color-success-bg: rgba(52, 211, 153, 0.12);
-  --color-warning: #fbbf24;
-  --color-warning-bg: rgba(251, 191, 36, 0.12);
-  --color-error: #f87171;
-  --color-error-bg: rgba(248, 113, 113, 0.12);
-  --color-info: #3897ff;
-  --color-info-bg: rgba(56, 151, 255, 0.12);
+  --color-success: #3ecf8e;
+  --color-success-bg: rgba(62, 207, 142, 0.1);
+  --color-warning: #e5b84a;
+  --color-warning-bg: rgba(229, 184, 74, 0.1);
+  --color-error: #ef6b6b;
+  --color-error-bg: rgba(239, 107, 107, 0.1);
+  --color-info: #4a9eff;
+  --color-info-bg: rgba(74, 158, 255, 0.1);
 
   /* Layout */
   --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --shadow-glow: 0 0 24px rgba(56, 151, 255, 0.08);
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 /* Base */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family:
-    system-ui,
     -apple-system,
+    BlinkMacSystemFont,
     "SF Pro Text",
+    "Segoe UI",
+    system-ui,
     sans-serif;
   font-size: 14px;
+  line-height: 1.5;
   color: var(--color-text);
   background: var(--color-bg-main);
   -webkit-font-smoothing: antialiased;
@@ -76,12 +78,41 @@ a {
 }
 
 a:hover {
-  color: var(--color-accent);
+  color: var(--color-primary-hover);
+  text-decoration: underline;
 }
 
 h2 {
-  margin-top: 0;
+  margin: 0 0 0.35rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   color: var(--color-text);
+}
+
+h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+h4 {
+  margin: 1.25rem 0 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.main > h2 + p,
+.main > p:first-of-type {
+  color: var(--color-text-muted);
+  max-width: 52ch;
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+  line-height: 1.55;
 }
 
 /* Shared UI patterns */
@@ -93,26 +124,29 @@ h2 {
 .questionnaire,
 .field-card {
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-md);
-  padding: 1rem;
+  padding: 1rem 1.1rem;
 }
 
 .btn-primary,
 .primary {
-  background: var(--gradient-brand);
+  background: var(--color-primary);
   color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
+  border: 1px solid transparent;
+  padding: 0.45rem 0.9rem;
   border-radius: var(--radius-sm);
   cursor: pointer;
   font-weight: 500;
-  transition: opacity 0.15s;
+  font-size: 0.875rem;
+  transition:
+    background 0.12s ease,
+    opacity 0.12s ease;
 }
 
-.btn-primary:hover,
-.primary:hover {
-  opacity: 0.9;
+.btn-primary:hover:not(:disabled),
+.primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
 }
 
 .btn-primary:disabled,
@@ -127,11 +161,16 @@ button {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   cursor: pointer;
+  font-size: 0.875rem;
+  padding: 0.4rem 0.75rem;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease;
 }
 
 button:hover:not(:disabled) {
   background: var(--color-surface-hover);
-  border-color: var(--color-primary-dim);
+  border-color: var(--color-border);
 }
 
 input[type="text"],
@@ -144,6 +183,7 @@ textarea {
   color: var(--color-text);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
+  font-size: 0.875rem;
 }
 
 input:focus,
@@ -151,7 +191,7 @@ select:focus,
 textarea:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(56, 151, 255, 0.2);
+  box-shadow: 0 0 0 3px var(--color-primary-muted);
 }
 
 .empty,
@@ -163,84 +203,95 @@ textarea:focus {
 .disclaimer,
 .warning-box {
   background: var(--color-warning-bg);
-  border: 1px solid rgba(251, 191, 36, 0.25);
+  border: 1px solid rgba(229, 184, 74, 0.22);
   border-radius: var(--radius-sm);
-  padding: 0.75rem;
+  padding: 0.75rem 0.85rem;
   color: var(--color-text);
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 
 .disclaimer {
   background: var(--color-info-bg);
-  border-color: rgba(56, 151, 255, 0.25);
+  border-color: rgba(74, 158, 255, 0.22);
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
   background: var(--color-surface);
-  font-size: 0.9rem;
+  font-size: 0.875rem;
+  border-radius: var(--radius-md);
+  overflow: hidden;
 }
 
 th,
 td {
-  border: 1px solid var(--color-border);
-  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--color-border-subtle);
+  padding: 0.45rem 0.65rem;
   text-align: left;
 }
 
 th {
   background: var(--color-bg-elevated);
   color: var(--color-text-muted);
+  font-weight: 500;
+  font-size: 0.8rem;
 }
 
 pre {
   background: var(--color-bg);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-sm);
   color: var(--color-text-muted);
 }
 
 code {
   color: var(--color-primary);
+  font-size: 0.85em;
 }
 
 fieldset {
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-sm);
-  padding: 0.75rem;
+  padding: 0.75rem 1rem;
 }
 
 legend {
   color: var(--color-text-muted);
+  font-size: 0.85rem;
+  padding: 0 0.25rem;
 }
 
 .banner.loading {
   background: var(--color-info-bg);
-  border: 1px solid rgba(56, 151, 255, 0.3);
+  border: 1px solid rgba(74, 158, 255, 0.25);
   color: var(--color-primary);
 }
 
 .banner.error {
   background: var(--color-error-bg);
-  border: 1px solid rgba(248, 113, 113, 0.3);
+  border: 1px solid rgba(239, 107, 107, 0.25);
   color: var(--color-error);
 }
 
 .tabs button.active {
-  background: var(--gradient-brand);
-  color: #fff;
-  border-color: transparent;
+  background: var(--color-primary-muted);
+  color: var(--color-primary);
+  border-color: rgba(74, 158, 255, 0.35);
+  font-weight: 500;
 }
 
 .saved,
 .test-result.ok {
   background: var(--color-success-bg);
-  border: 1px solid rgba(52, 211, 153, 0.3);
+  border: 1px solid rgba(62, 207, 142, 0.25);
   color: var(--color-success);
 }
 
 .test-result:not(.ok) {
   background: var(--color-error-bg);
+  border: 1px solid rgba(239, 107, 107, 0.25);
   color: var(--color-error);
 }
 
@@ -260,14 +311,15 @@ legend {
 }
 
 .options button.selected {
-  background: var(--gradient-brand);
-  color: #fff;
-  border-color: transparent;
+  background: var(--color-primary-muted);
+  color: var(--color-primary);
+  border-color: rgba(74, 158, 255, 0.35);
+  font-weight: 500;
 }
 
 .preview {
   background: var(--color-bg);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-md);
 }
 
@@ -277,6 +329,10 @@ legend {
   color: var(--color-primary);
   cursor: pointer;
   text-decoration: underline;
-  font-size: 1rem;
+  font-size: inherit;
   padding: 0;
+}
+
+.link:hover {
+  color: var(--color-primary-hover);
 }

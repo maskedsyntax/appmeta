@@ -2,6 +2,7 @@
   import { project } from "$lib/stores/appStore";
   import { REVIEW_FIELDS } from "$lib/types";
   import FieldCard from "$lib/components/FieldCard.svelte";
+  import GenerateAllBar from "$lib/components/GenerateAllBar.svelte";
 
   function getField(name: string) {
     return $project?.generated_fields.find((f) => f.field === name) ?? { field: name, value: "" };
@@ -20,6 +21,8 @@
     </div>
   {/if}
 
+  <GenerateAllBar fields={[...REVIEW_FIELDS]} label="Generate All Review Fields" />
+
   {#each REVIEW_FIELDS as fieldName}
     <FieldCard field={getField(fieldName)} />
   {/each}
@@ -33,5 +36,6 @@
 {/if}
 
 <style>
+  .notice { margin-bottom: 1rem; }
   .manual { margin-top: 1rem; }
 </style>

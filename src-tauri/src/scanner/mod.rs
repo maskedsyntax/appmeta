@@ -4,6 +4,7 @@ mod dependencies;
 mod permissions;
 mod documents;
 mod features;
+mod links;
 
 pub mod types;
 
@@ -33,6 +34,7 @@ pub fn scan_project(path: &str) -> AppResult<ProjectScanResult> {
     let mut risk_flags = Vec::new();
     let mut questions = Vec::new();
     let mut document_summaries = Vec::new();
+    let mut detected_urls = Vec::new();
 
     let pubspec_path = root.join("pubspec.yaml");
     if pubspec_path.exists() {
@@ -119,6 +121,13 @@ pub fn scan_project(path: &str) -> AppResult<ProjectScanResult> {
         }
     }
 
+    if let Ok(urls) = links::detect_urls(root) {
+        for u in &urls {
+            files_scanned.push(format!("url:{}", u.source_file));
+        }
+        detected_urls = urls;
+    }
+
     if root.join("lib").exists() {
         detected_features = features::detect_features(root)?;
         for f in &detected_features {
@@ -150,6 +159,7 @@ pub fn scan_project(path: &str) -> AppResult<ProjectScanResult> {
         risk_flags,
         questions,
         document_summaries,
+        detected_urls,
         confidence: confidence.to_string(),
     })
 }

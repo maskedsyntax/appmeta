@@ -2,6 +2,7 @@
   import { project, persistProject } from "$lib/stores/appStore";
   import { PRIVACY_FIELDS } from "$lib/types";
   import FieldCard from "$lib/components/FieldCard.svelte";
+  import GenerateAllBar from "$lib/components/GenerateAllBar.svelte";
 
   function getField(name: string) {
     return $project?.generated_fields.find((f) => f.field === name) ?? { field: name, value: "" };
@@ -32,13 +33,14 @@
     </form>
   </section>
 
+  <GenerateAllBar fields={[...PRIVACY_FIELDS]} label="Generate All Privacy Fields" />
+
   {#each PRIVACY_FIELDS as fieldName}
     <FieldCard field={getField(fieldName)} />
   {/each}
 {/if}
 
 <style>
-  .notice { margin-bottom: 1rem; }
   .questionnaire { margin-bottom: 1.5rem; }
   form label { display: block; margin: 0.4rem 0; }
   input[type="url"],

@@ -9,7 +9,10 @@
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "website:dev": "npm run dev --prefix website",
+    "website:build": "npm run build --prefix website",
+    "website:check": "npm run check --prefix website"
   },
   "license": "MIT",
   "dependencies": {

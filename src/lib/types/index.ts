@@ -119,6 +119,7 @@ export interface ProjectTruthFile {
   source_facts: SourceFact[];
   generated_fields: GeneratedField[];
   question_answers: Record<string, string>;
+  scan_questions: ConfirmationQuestion[];
 }
 
 export interface ProjectSummary {
@@ -161,6 +162,7 @@ export interface ProjectScanResult {
   risk_flags: RiskFlag[];
   questions: ConfirmationQuestion[];
   document_summaries: DocumentSummary[];
+  detected_urls: DetectedUrl[];
   confidence: string;
 }
 
@@ -205,6 +207,13 @@ export interface DocumentSummary {
   file_name: string;
   first_paragraph: string;
   line_count: number;
+}
+
+export interface DetectedUrl {
+  url: string;
+  kind: string;
+  source_file: string;
+  confidence: string;
 }
 
 export const FIELD_LIMITS: Record<string, number> = {

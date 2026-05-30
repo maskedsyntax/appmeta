@@ -47,10 +47,41 @@ npm run check
 
 ```
 src-tauri/src/   Rust backend (scanner, AI, validation, export)
-src/             SvelteKit frontend
+src/             SvelteKit frontend (desktop app)
+website/         Marketing site (SvelteKit, GitHub Pages)
 spec.md          Full product specification
 TODO.md          Implementation checklist
 ```
+
+## Marketing website
+
+The public site lives in `website/` as a separate SvelteKit app (static prerender for GitHub Pages).
+
+```bash
+# Install website dependencies (first time)
+npm ci --prefix website
+
+# Local dev (http://localhost:5173)
+npm run website:dev
+
+# Typecheck
+npm run website:check
+
+# Production build (custom domain — no base path)
+npm run website:build
+```
+
+Live site: **https://appmeta.maskedsyntax.com**
+
+### Deployment
+
+Pushes to `main` that touch `website/**` run [`.github/workflows/deploy-website.yml`](.github/workflows/deploy-website.yml), which builds the static site and publishes to GitHub Pages.
+
+1. **Settings → Pages → Build and deployment → Source:** GitHub Actions
+2. **Custom domain:** `appmeta.maskedsyntax.com` (also in [`website/static/CNAME`](website/static/CNAME))
+3. **Manual deploy:** Actions → Deploy Website → Run workflow
+
+DNS: `CNAME` record `appmeta` → `<user-or-org>.github.io` (or the target shown in Pages settings).
 
 ## License
 

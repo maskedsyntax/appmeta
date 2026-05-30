@@ -22,9 +22,12 @@ fn validate_completeness(project: &ProjectTruthFile, warnings: &mut Vec<Validati
     }
     if project.privacy.privacy_policy_url.is_empty() {
         warnings.push(ValidationWarning {
-            severity: "warning".into(),
+            severity: "info".into(),
             field: "privacy_policy_url".into(),
-            message: "Privacy policy URL is missing.".into(),
+            message: "Add your App Store Connect privacy policy URL on the Facts or Privacy page. \
+                      AppMeta scans local project files (README, privacy.md) for links but does \
+                      not browse your live website."
+                .into(),
         });
     }
     if project.review.requires_login == Some(true)
@@ -73,13 +76,7 @@ fn validate_generated_fields(project: &ProjectTruthFile, warnings: &mut Vec<Vali
                 message: w.clone(),
             });
         }
-        for m in &field.missing_info {
-            warnings.push(ValidationWarning {
-                severity: "info".into(),
-                field: field.field.clone(),
-                message: m.clone(),
-            });
-        }
+        // missing_info is shown on the field card — don't flood the sidebar
     }
 
     let required_fields = ["subtitle", "description", "keywords"];
