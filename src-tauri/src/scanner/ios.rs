@@ -5,6 +5,8 @@ use std::path::Path;
 
 pub struct IosInfo {
     pub bundle_id: Option<String>,
+    pub display_name: Option<String>,
+    pub bundle_name: Option<String>,
     pub version: Option<String>,
     pub build_number: Option<String>,
     pub min_os_version: Option<String>,
@@ -22,6 +24,14 @@ pub fn parse_info_plist(path: &Path) -> AppResult<IosInfo> {
 
     let bundle_id = dict
         .get("CFBundleIdentifier")
+        .and_then(|v| v.as_string())
+        .map(String::from);
+    let display_name = dict
+        .get("CFBundleDisplayName")
+        .and_then(|v| v.as_string())
+        .map(String::from);
+    let bundle_name = dict
+        .get("CFBundleName")
         .and_then(|v| v.as_string())
         .map(String::from);
     let version = dict
@@ -63,6 +73,8 @@ pub fn parse_info_plist(path: &Path) -> AppResult<IosInfo> {
 
     Ok(IosInfo {
         bundle_id,
+        display_name,
+        bundle_name,
         version,
         build_number,
         min_os_version,

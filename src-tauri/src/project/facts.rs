@@ -1,5 +1,8 @@
 use crate::project::truth_file::*;
+use crate::scanner::documents;
+use crate::scanner::naming::humanize_token;
 use crate::scanner::ProjectScanResult;
+use std::path::Path;
 use uuid::Uuid;
 
 pub fn create_project_from_scan(scan: ProjectScanResult) -> ProjectTruthFile {
@@ -44,6 +47,128 @@ pub fn create_project_from_scan(scan: ProjectScanResult) -> ProjectTruthFile {
         scan_questions: scan.questions.clone(),
     };
 
+    apply_scan_suggestions(&mut project, &scan);
+    populate_scan_facts(&mut project, &scan);
+    project
+}
+
+/// Re-apply scan-derived suggestions without wiping generated fields or answers.
+pub fn refresh_project_from_scan(
+    mut project: ProjectTruthFile,
+    scan: ProjectScanResult,
+) -> ProjectTruthFile {
+    apply_scan_suggestions(&mut project, &scan);
+    project.scan_questions = scan.questions;
+    project.touch();
+    project
+}
+
+fn apply_scan_suggestions(project: &mut ProjectTruthFile, scan: &ProjectScanResult) {
+    if let Some(name) = &scan.app_name {
+        project.app_identity.app_name = name.clone();
+        project.project.name = name.clone();
+    }
+
+    let root = Path::new(&scan.path);
+    let mut short = String::new();
+    let mut long = String::new();
+
+    for doc in &scan.document_summaries {
+        if doc.file_name == "README.md" && !doc.first_paragraph.is_empty() {
+            short = doc.first_paragraph.clone();
+        }
+        if doc.file_name == "spec.md" && !doc.first_paragraph.is_empty() && long.is_empty() {
+            long = doc.first_paragraph.clone();
+        }
+        if doc.file_name == "pubspec.yaml" && short.is_empty() && !doc.first_paragraph.is_empty() {
+            short = doc.first_paragraph.clone();
+        }
+    }
+
+    if let Ok(readme) = std::fs::read_to_string(root.join("README.md")) {
+        if short.is_empty() {
+            short = documents::extract_summary_excerpt(&readme, 200);
+        }
+        if long.is_empty() {
+            long = documents::extract_summary_excerpt(&readme, 800);
+        }
+    }
+    if long.is_empty() {
+        if let Ok(spec) = std::fs::read_to_string(root.join("spec.md")) {
+            long = documents::extract_summary_excerpt(&spec, 800);
+        }
+    }
+
+    if project.summary.short_summary.is_empty() && !short.is_empty() {
+        project.summary.short_summary = short;
+    }
+    if project.summary.long_summary.is_empty() && !long.is_empty() {
+        project.summary.long_summary = long;
+    }
+
+    if project.app_identity.primary_category.is_empty() {
+        let hint = suggest_primary_category(&project.summary.short_summary, &project.summary.long_summary);
+        project.app_identity.primary_category = hint;
+    }
+
+    if let Some(url) = scan
+        .detected_urls
+        .iter()
+        .find(|u| u.kind == "privacy_policy")
+    {
+        if project.privacy.privacy_policy_url.is_empty() {
+            project.privacy.privacy_policy_url = url.url.clone();
+        }
+    }
+
+    // Simple privacy defaults for typical local-first Flutter apps
+    if project.privacy.stores_data_locally.is_none() {
+        project.privacy.stores_data_locally = Some(true);
+    }
+}
+
+fn suggest_primary_category(short: &str, long: &str) -> String {
+    let text = format!("{short} {long}").to_lowercase();
+    let rules: &[(&[&str], &str)] = &[
+        (
+            &["game", "puzzle", "arcade", "play"],
+            "Games",
+        ),
+        (
+            &["health", "fitness", "workout", "meditation", "habit"],
+            "Health & Fitness",
+        ),
+        (
+            &["finance", "budget", "money", "expense", "invoice"],
+            "Finance",
+        ),
+        (
+            &["photo", "camera", "video", "edit"],
+            "Photo & Video",
+        ),
+        (
+            &["learn", "study", "education", "course"],
+            "Education",
+        ),
+        (
+            &["shop", "store", "commerce", "retail"],
+            "Shopping",
+        ),
+        (
+            &["count", "counter", "tracker", "productivity", "tool", "utility", "timer"],
+            "Utilities",
+        ),
+    ];
+
+    for (keywords, category) in rules {
+        if keywords.iter().any(|k| text.contains(k)) {
+            return category.to_string();
+        }
+    }
+    "Productivity".to_string()
+}
+
+fn populate_scan_facts(project: &mut ProjectTruthFile, scan: &ProjectScanResult) {
     if let Some(framework) = &scan.framework {
         project.source_facts.push(SourceFact {
             id: Uuid::new_v4().to_string(),
@@ -51,6 +176,18 @@ pub fn create_project_from_scan(scan: ProjectScanResult) -> ProjectTruthFile {
             source_type: "scanner".into(),
             source_file: scan.path.clone(),
             confidence: scan.confidence.clone(),
+            verified: true,
+            status: "verified".into(),
+        });
+    }
+
+    if let Some(name) = &scan.app_name {
+        project.source_facts.push(SourceFact {
+            id: Uuid::new_v4().to_string(),
+            fact: format!("Display name: {name}"),
+            source_type: "scanner".into(),
+            source_file: "resolved".into(),
+            confidence: "high".into(),
             verified: true,
             status: "verified".into(),
         });
@@ -86,7 +223,7 @@ pub fn create_project_from_scan(scan: ProjectScanResult) -> ProjectTruthFile {
 
     for feature in &scan.detected_features {
         project.features.push(Feature {
-            name: feature.name.clone(),
+            name: humanize_token(&feature.name),
             description: String::new(),
             source: feature.source_file.clone(),
             verified: false,
@@ -136,9 +273,6 @@ pub fn create_project_from_scan(scan: ProjectScanResult) -> ProjectTruthFile {
         if flag.flag.contains("iap") {
             project.monetization.has_iap = Some(true);
         }
-        if flag.flag.contains("analytics") || flag.flag.contains("data_collection") {
-            // signal only, user must confirm
-        }
     }
 
     for doc in &scan.document_summaries {
@@ -152,35 +286,54 @@ pub fn create_project_from_scan(scan: ProjectScanResult) -> ProjectTruthFile {
                 verified: false,
                 status: "needs_confirmation".into(),
             });
-            if project.summary.short_summary.is_empty() && doc.file_name == "README.md" {
-                project.summary.short_summary = doc.first_paragraph.clone();
-            }
         }
     }
 
-    if let Some(privacy_url) = scan
-        .detected_urls
-        .iter()
-        .find(|u| u.kind == "privacy_policy")
-    {
-        if project.privacy.privacy_policy_url.is_empty() {
-            project.privacy.privacy_policy_url = privacy_url.url.clone();
-        }
+    if !project.summary.short_summary.is_empty() {
         project.source_facts.push(SourceFact {
             id: Uuid::new_v4().to_string(),
-            fact: format!(
-                "Privacy policy URL detected: {} (confirm this is correct for App Store Connect)",
-                privacy_url.url
-            ),
+            fact: format!("Suggested short summary: {}", project.summary.short_summary),
             source_type: "scanner".into(),
-            source_file: privacy_url.source_file.clone(),
-            confidence: privacy_url.confidence.clone(),
+            source_file: "README.md".into(),
+            confidence: "medium".into(),
             verified: false,
             status: "needs_confirmation".into(),
         });
     }
 
-    project
+    if !project.app_identity.primary_category.is_empty() {
+        project.source_facts.push(SourceFact {
+            id: Uuid::new_v4().to_string(),
+            fact: format!(
+                "Suggested category: {}",
+                project.app_identity.primary_category
+            ),
+            source_type: "scanner".into(),
+            source_file: "heuristic".into(),
+            confidence: "medium".into(),
+            verified: false,
+            status: "needs_confirmation".into(),
+        });
+    }
+
+    if let Some(url) = scan
+        .detected_urls
+        .iter()
+        .find(|u| u.kind == "privacy_policy")
+    {
+        project.source_facts.push(SourceFact {
+            id: Uuid::new_v4().to_string(),
+            fact: format!(
+                "Privacy policy URL detected: {} (confirm for App Store Connect)",
+                url.url
+            ),
+            source_type: "scanner".into(),
+            source_file: url.source_file.clone(),
+            confidence: url.confidence.clone(),
+            verified: false,
+            status: "needs_confirmation".into(),
+        });
+    }
 }
 
 pub fn update_fact_status(project: &mut ProjectTruthFile, fact_id: &str, status: &str) {
@@ -211,7 +364,6 @@ pub fn answer_question(
     };
     project.source_facts.push(fact);
 
-    // Apply common answer side effects
     let lower = answer.to_lowercase();
     if question_id.contains("iap") || lower.contains("subscription") || lower.contains("unlock") {
         project.monetization.has_iap = Some(!lower.contains("none"));
@@ -228,4 +380,49 @@ pub fn answer_question(
     }
 
     project.touch();
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::scanner::types::DocumentSummary;
+
+    #[test]
+    fn suggests_utilities_for_counter_app() {
+        assert_eq!(
+            suggest_primary_category("Count anything. Instantly.", ""),
+            "Utilities"
+        );
+    }
+
+    #[test]
+    fn fills_summary_from_scan() {
+        let scan = ProjectScanResult {
+            path: "/tmp/tickle".into(),
+            framework: Some("Flutter".into()),
+            platforms: vec!["iOS".into()],
+            app_name: Some("Tickle".into()),
+            bundle_id: Some("com.example.tickle".into()),
+            version: Some("1.0".into()),
+            build_number: None,
+            min_os_version: None,
+            dependencies: vec![],
+            permissions: vec![],
+            files_scanned: vec![],
+            detected_features: vec![],
+            risk_flags: vec![],
+            questions: vec![],
+            document_summaries: vec![DocumentSummary {
+                file_name: "README.md".into(),
+                first_paragraph: "Count anything. Instantly.".into(),
+                line_count: 3,
+            }],
+            detected_urls: vec![],
+            confidence: "high".into(),
+        };
+        let project = create_project_from_scan(scan);
+        assert_eq!(project.app_identity.app_name, "Tickle");
+        assert_eq!(project.summary.short_summary, "Count anything. Instantly.");
+        assert_eq!(project.app_identity.primary_category, "Utilities");
+    }
 }

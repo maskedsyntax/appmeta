@@ -2,9 +2,10 @@ mod flutter;
 mod ios;
 mod dependencies;
 mod permissions;
-mod documents;
+pub mod documents;
 mod features;
 mod links;
+pub mod naming;
 
 pub mod types;
 
@@ -23,7 +24,6 @@ pub fn scan_project(path: &str) -> AppResult<ProjectScanResult> {
     let mut files_scanned = Vec::new();
     let framework;
     let mut platforms = Vec::new();
-    let mut app_name = None;
     let mut bundle_id = None;
     let mut version = None;
     let mut build_number = None;
@@ -35,6 +35,10 @@ pub fn scan_project(path: &str) -> AppResult<ProjectScanResult> {
     let mut questions = Vec::new();
     let mut document_summaries = Vec::new();
     let mut detected_urls = Vec::new();
+    let mut package_name = None;
+    let mut ios_display_name = None;
+    let mut ios_bundle_name = None;
+    let mut readme_title = None;
 
     let pubspec_path = root.join("pubspec.yaml");
     if pubspec_path.exists() {
@@ -49,7 +53,7 @@ pub fn scan_project(path: &str) -> AppResult<ProjectScanResult> {
         files_scanned.push("pubspec.yaml".to_string());
 
         let pubspec = flutter::parse_pubspec(&pubspec_path)?;
-        app_name = pubspec.name.clone();
+        package_name = pubspec.name.clone();
         version = pubspec.version.clone();
         if let Some(desc) = pubspec.description {
             document_summaries.push(DocumentSummary {
@@ -94,6 +98,12 @@ pub fn scan_project(path: &str) -> AppResult<ProjectScanResult> {
                 .to_string();
             files_scanned.push(rel.clone());
             let ios_info = ios::parse_info_plist(plist_path)?;
+            if ios_display_name.is_none() {
+                ios_display_name = ios_info.display_name;
+            }
+            if ios_bundle_name.is_none() {
+                ios_bundle_name = ios_info.bundle_name;
+            }
             if bundle_id.is_none() {
                 bundle_id = ios_info.bundle_id;
             }
@@ -119,6 +129,9 @@ pub fn scan_project(path: &str) -> AppResult<ProjectScanResult> {
             files_scanned.push(doc.file_name.clone());
             document_summaries.push(doc);
         }
+        if let Ok(readme) = std::fs::read_to_string(root.join("README.md")) {
+            readme_title = documents::extract_markdown_title(&readme);
+        }
     }
 
     if let Ok(urls) = links::detect_urls(root) {
@@ -134,6 +147,15 @@ pub fn scan_project(path: &str) -> AppResult<ProjectScanResult> {
             files_scanned.push(f.source_file.clone());
         }
     }
+
+    let app_name = naming::resolve_display_name(
+        root,
+        package_name.as_deref(),
+        ios_display_name.as_deref(),
+        ios_bundle_name.as_deref(),
+        bundle_id.as_deref(),
+        readme_title.as_deref(),
+    );
 
     let confidence = if app_name.is_some() && bundle_id.is_some() {
         "high"
@@ -205,10 +227,39 @@ dependencies:
 
         let result = scan_project(root.to_str().unwrap()).unwrap();
         assert_eq!(result.framework.as_deref(), Some("Flutter"));
-        assert_eq!(result.app_name.as_deref(), Some("test_app"));
+        assert_eq!(result.app_name.as_deref(), Some("Test"));
         assert_eq!(result.bundle_id.as_deref(), Some("com.example.test"));
         assert!(!result.dependencies.is_empty());
         assert!(!result.questions.is_empty());
         assert!(!result.detected_features.is_empty());
+    }
+
+    #[test]
+    fn resolves_workspace_package_to_folder_name() {
+        let dir = TempDir::new().unwrap();
+        let root = dir.path().join("tickle");
+        fs::create_dir_all(root.join("ios/Runner")).unwrap();
+        fs::write(
+            root.join("pubspec.yaml"),
+            r#"name: tickle_workspace
+version: 1.0.0
+dependencies:
+  flutter:
+    sdk: flutter
+"#,
+        )
+        .unwrap();
+        fs::write(
+            root.join("ios/Runner/Info.plist"),
+            r#"<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>CFBundleIdentifier</key><string>com.example.tickle</string>
+</dict></plist>"#,
+        )
+        .unwrap();
+
+        let result = scan_project(root.to_str().unwrap()).unwrap();
+        assert_eq!(result.app_name.as_deref(), Some("Tickle"));
     }
 }

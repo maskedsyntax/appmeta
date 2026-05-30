@@ -18,6 +18,7 @@ pub fn run() {
             pick_save_folder,
             scan_project_cmd,
             create_project_from_scan_cmd,
+            refresh_project_from_scan_cmd,
             save_project_cmd,
             load_project_cmd,
             list_projects_cmd,

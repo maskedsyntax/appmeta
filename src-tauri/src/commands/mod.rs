@@ -106,6 +106,14 @@ pub async fn mask_api_key_cmd(key: String) -> Result<String, String> {
 }
 
 #[tauri::command]
+pub fn refresh_project_from_scan_cmd(
+    project: ProjectTruthFile,
+    scan: crate::scanner::ProjectScanResult,
+) -> Result<ProjectTruthFile, String> {
+    Ok(crate::project::refresh_project_from_scan(project, scan))
+}
+
+#[tauri::command]
 pub async fn generate_field_cmd(
     app: tauri::AppHandle,
     project: ProjectTruthFile,

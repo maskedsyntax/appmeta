@@ -98,6 +98,12 @@ pub fn build_user_prompt(
         .map(|m| m.to_string())
         .unwrap_or_else(|| "none".to_string());
 
+    let extra = if field_name == "keywords" {
+        "\nTarget 95–100 characters. Pack maximum relevant search terms separated by commas with no spaces."
+    } else {
+        ""
+    };
+
     format!(
         r#"Project context:
 {context}
@@ -106,10 +112,10 @@ Generate field: {field_name}
 
 Constraints: {constraints}
 Character limit: {max_chars}
-Tone: {}
+Tone: {tone}{extra}
 
 Remember: "value" must contain the final text — never empty."#,
-        settings.tone
+        tone = settings.tone,
     )
 }
 

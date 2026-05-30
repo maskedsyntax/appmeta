@@ -19,7 +19,9 @@ pub fn field_constraints(field: &str) -> &'static str {
             "Full app description. Be specific about verified features only. No exaggerated claims."
         }
         "keywords" => {
-            "Maximum 100 characters total. Comma-separated, no spaces after commas. No repeat of app name."
+            "Maximum 100 characters total. Comma-separated, NO spaces after commas. \
+             Use 95–100 characters — pack in as many relevant, high-traffic search terms as fit. \
+             Do not repeat the app name. Include category terms, synonyms, and what users would search for."
         }
         "whats_new" => "Release notes for this version. Mention verified changes only.",
         "review_notes" => {

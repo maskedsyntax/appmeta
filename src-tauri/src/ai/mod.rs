@@ -61,7 +61,39 @@ pub async fn generate_field(
             parsed.warnings.first().cloned().unwrap_or_else(|| "Try gpt-4o-mini.".into())
         )));
     }
-    Ok(parsed)
+
+    let mut result = parsed;
+    if field == "keywords" {
+        let extra: Vec<String> = project
+            .features
+            .iter()
+            .flat_map(|f| {
+                f.name
+                    .split_whitespace()
+                    .chain(f.description.split_whitespace())
+                    .map(String::from)
+                    .collect::<Vec<_>>()
+            })
+            .chain(project.summary.short_summary.split_whitespace().map(String::from))
+            .collect();
+        let optimized = crate::project::keywords::optimize_keywords(
+            &result.value,
+            &project.app_identity.app_name,
+            &extra,
+            100,
+        );
+        result.value = optimized.clone();
+        result.character_count = optimized.chars().count();
+        result.max_characters = Some(100);
+        if result.character_count < 90 {
+            result.warnings.push(format!(
+                "Keywords use {}/100 characters after optimization — review and regenerate if needed.",
+                result.character_count
+            ));
+        }
+    }
+
+    Ok(result)
 }
 
 pub async fn test_ai_connection(settings: &AppSettings) -> AppResult<String> {

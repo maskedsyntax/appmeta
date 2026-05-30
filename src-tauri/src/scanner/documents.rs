@@ -17,6 +17,47 @@ pub fn scan_documents(root: &Path) -> AppResult<Vec<DocumentSummary>> {
     Ok(summaries)
 }
 
+pub fn extract_markdown_title(content: &str) -> Option<String> {
+    for line in content.lines() {
+        let trimmed = line.trim();
+        if let Some(title) = trimmed.strip_prefix("# ") {
+            let title = title.trim();
+            if !title.is_empty() {
+                return Some(title.to_string());
+            }
+        }
+    }
+    None
+}
+
+pub fn extract_summary_excerpt(content: &str, max_chars: usize) -> String {
+    let mut parts = Vec::new();
+    for line in content.lines() {
+        let trimmed = line.trim();
+        if trimmed.is_empty()
+            || trimmed.starts_with('#')
+            || trimmed.starts_with("```")
+            || trimmed.starts_with(">")
+            || trimmed.starts_with("---")
+        {
+            continue;
+        }
+        parts.push(trimmed);
+        let joined = parts.join(" ");
+        if joined.chars().count() >= max_chars {
+            return truncate_chars(&joined, max_chars);
+        }
+    }
+    parts.join(" ")
+}
+
+fn truncate_chars(s: &str, max: usize) -> String {
+    if s.chars().count() <= max {
+        return s.to_string();
+    }
+    s.chars().take(max.saturating_sub(3)).collect::<String>() + "..."
+}
+
 fn read_document_summary(path: &Path, file_name: &str) -> AppResult<DocumentSummary> {
     let content = std::fs::read_to_string(path)?;
     let line_count = content.lines().count();

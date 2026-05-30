@@ -27,6 +27,13 @@ export async function createProjectFromScan(
   return invoke("create_project_from_scan_cmd", { scan });
 }
 
+export async function refreshProjectFromScan(
+  project: ProjectTruthFile,
+  scan: ProjectScanResult,
+): Promise<ProjectTruthFile> {
+  return invoke("refresh_project_from_scan_cmd", { project, scan });
+}
+
 export async function saveProject(project: ProjectTruthFile): Promise<void> {
   return invoke("save_project_cmd", { project });
 }

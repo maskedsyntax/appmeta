@@ -73,7 +73,7 @@ export async function rescanCurrentProject() {
     const result = await api.scanProject(p.project.path);
     scanResult.set(result);
     pendingQuestions.set(result.questions);
-    const updated = { ...p, scan_questions: result.questions };
+    const updated = await api.refreshProjectFromScan(p, result);
     await persistProject(updated);
   } catch (e) {
     error.set(String(e));
