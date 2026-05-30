@@ -1,0 +1,112 @@
+{
+  "firebase_analytics": {
+    "category": "analytics",
+    "risk": "data_collection_possible",
+    "question": "Do you send analytics events from the app?"
+  },
+  "firebase_crashlytics": {
+    "category": "crash_reporting",
+    "risk": "diagnostics_data_possible",
+    "question": "Do you collect crash reports or diagnostics?"
+  },
+  "sentry_flutter": {
+    "category": "crash_reporting",
+    "risk": "diagnostics_data_possible",
+    "question": "Do you use Sentry in production?"
+  },
+  "google_mobile_ads": {
+    "category": "ads",
+    "risk": "tracking_possible",
+    "question": "Does the app show ads or use ad tracking?"
+  },
+  "in_app_purchase": {
+    "category": "iap",
+    "risk": "iap_detected",
+    "question": "What type of in-app purchases does the app offer?"
+  },
+  "purchases_flutter": {
+    "category": "iap",
+    "risk": "subscription_or_iap_detected",
+    "question": "Are you using RevenueCat for subscriptions, one-time unlocks, or tips?"
+  },
+  "revenuecat": {
+    "category": "iap",
+    "risk": "subscription_or_iap_detected",
+    "question": "Are you using RevenueCat for subscriptions, one-time unlocks, or tips?"
+  },
+  "drift": {
+    "category": "local_database",
+    "risk": "local_storage_detected",
+    "question": "Is user data stored only on-device?"
+  },
+  "sqflite": {
+    "category": "local_database",
+    "risk": "local_storage_detected",
+    "question": "Is user data stored only on-device?"
+  },
+  "supabase_flutter": {
+    "category": "backend",
+    "risk": "server_data_possible",
+    "question": "What user data is sent to Supabase?"
+  },
+  "firebase_auth": {
+    "category": "auth",
+    "risk": "account_possible",
+    "question": "Does the app require user accounts or login?"
+  },
+  "firebase_core": {
+    "category": "backend",
+    "risk": "server_data_possible",
+    "question": "What Firebase services does the app use in production?"
+  },
+  "google_sign_in": {
+    "category": "auth",
+    "risk": "account_possible",
+    "question": "Does the app use Google Sign-In for authentication?"
+  },
+  "sign_in_with_apple": {
+    "category": "auth",
+    "risk": "account_possible",
+    "question": "Does the app use Sign in with Apple?"
+  },
+  "flutter_secure_storage": {
+    "category": "local_database",
+    "risk": "local_storage_detected",
+    "question": "What sensitive data is stored locally?"
+  },
+  "shared_preferences": {
+    "category": "local_database",
+    "risk": "local_storage_detected",
+    "question": "What user preferences or data are stored locally?"
+  },
+  "permission_handler": {
+    "category": "permissions",
+    "risk": "permissions_detected",
+    "question": "Which device permissions does the app request at runtime?"
+  },
+  "camera": {
+    "category": "permissions",
+    "risk": "camera_possible",
+    "question": "Does the app use the device camera?"
+  },
+  "geolocator": {
+    "category": "permissions",
+    "risk": "location_possible",
+    "question": "Does the app access the user's location?"
+  },
+  "health": {
+    "category": "health",
+    "risk": "health_data_possible",
+    "question": "Does the app access HealthKit or health data?"
+  },
+  "mixpanel_flutter": {
+    "category": "analytics",
+    "risk": "data_collection_possible",
+    "question": "Do you send analytics events via Mixpanel?"
+  },
+  "amplitude_flutter": {
+    "category": "analytics",
+    "risk": "data_collection_possible",
+    "question": "Do you send analytics events via Amplitude?"
+  }
+}

@@ -1,0 +1,282 @@
+/**
+ * AppMeta theme — derived from appmeta-ios-dark.jpg
+ * Primary blue → purple → magenta gradient on true black
+ */
+:root {
+  color-scheme: dark;
+
+  /* Backgrounds */
+  --color-bg: #000000;
+  --color-bg-main: #0a0a0f;
+  --color-bg-sidebar: #050508;
+  --color-bg-panel: #0e0e14;
+  --color-bg-elevated: #14141c;
+  --color-bg-input: #1a1a24;
+
+  /* Surfaces & borders */
+  --color-surface: #12121a;
+  --color-surface-hover: #1a1a26;
+  --color-border: #252532;
+  --color-border-subtle: #1c1c28;
+
+  /* Brand — logo gradient stops */
+  --color-primary: #3897ff;
+  --color-primary-dim: #2a6fc4;
+  --color-secondary: #7b61ff;
+  --color-accent: #ff2d78;
+  --color-indigo: #4776e6;
+
+  --gradient-brand: linear-gradient(135deg, #3897ff 0%, #7b61ff 55%, #ff2d78 100%);
+  --gradient-brand-subtle: linear-gradient(
+    135deg,
+    rgba(56, 151, 255, 0.15) 0%,
+    rgba(123, 97, 255, 0.12) 55%,
+    rgba(255, 45, 120, 0.1) 100%
+  );
+
+  /* Text */
+  --color-text: #e8e8f0;
+  --color-text-muted: #8888a0;
+  --color-text-dim: #5c5c70;
+
+  /* Semantic */
+  --color-success: #34d399;
+  --color-success-bg: rgba(52, 211, 153, 0.12);
+  --color-warning: #fbbf24;
+  --color-warning-bg: rgba(251, 191, 36, 0.12);
+  --color-error: #f87171;
+  --color-error-bg: rgba(248, 113, 113, 0.12);
+  --color-info: #3897ff;
+  --color-info-bg: rgba(56, 151, 255, 0.12);
+
+  /* Layout */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-glow: 0 0 24px rgba(56, 151, 255, 0.08);
+}
+
+/* Base */
+body {
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    "SF Pro Text",
+    sans-serif;
+  font-size: 14px;
+  color: var(--color-text);
+  background: var(--color-bg-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--color-accent);
+}
+
+h2 {
+  margin-top: 0;
+  color: var(--color-text);
+}
+
+/* Shared UI patterns */
+.card,
+.results,
+.current,
+.question,
+.manual,
+.questionnaire,
+.field-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+}
+
+.btn-primary,
+.primary {
+  background: var(--gradient-brand);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 500;
+  transition: opacity 0.15s;
+}
+
+.btn-primary:hover,
+.primary:hover {
+  opacity: 0.9;
+}
+
+.btn-primary:disabled,
+.primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+button {
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+  border-color: var(--color-primary-dim);
+}
+
+input[type="text"],
+input[type="url"],
+input[type="password"],
+input[type="number"],
+select,
+textarea {
+  background: var(--color-bg-input);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(56, 151, 255, 0.2);
+}
+
+.empty,
+.muted {
+  color: var(--color-text-muted);
+}
+
+.notice,
+.disclaimer,
+.warning-box {
+  background: var(--color-warning-bg);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem;
+  color: var(--color-text);
+}
+
+.disclaimer {
+  background: var(--color-info-bg);
+  border-color: rgba(56, 151, 255, 0.25);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface);
+  font-size: 0.9rem;
+}
+
+th,
+td {
+  border: 1px solid var(--color-border);
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+}
+
+th {
+  background: var(--color-bg-elevated);
+  color: var(--color-text-muted);
+}
+
+pre {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+}
+
+code {
+  color: var(--color-primary);
+}
+
+fieldset {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem;
+}
+
+legend {
+  color: var(--color-text-muted);
+}
+
+.banner.loading {
+  background: var(--color-info-bg);
+  border: 1px solid rgba(56, 151, 255, 0.3);
+  color: var(--color-primary);
+}
+
+.banner.error {
+  background: var(--color-error-bg);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  color: var(--color-error);
+}
+
+.tabs button.active {
+  background: var(--gradient-brand);
+  color: #fff;
+  border-color: transparent;
+}
+
+.saved,
+.test-result.ok {
+  background: var(--color-success-bg);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  color: var(--color-success);
+}
+
+.test-result:not(.ok) {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+}
+
+.status.verified {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.status.needs_confirmation {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+.status.rejected {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+}
+
+.options button.selected {
+  background: var(--gradient-brand);
+  color: #fff;
+  border-color: transparent;
+}
+
+.preview {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.link {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 1rem;
+  padding: 0;
+}
